@@ -1,0 +1,31 @@
+{
+  "name": "Virtual Beams Asteroid",
+  "description": "A simple implementation of asteroid with angular",
+  "version": "0.5.0",
+  "homepage": "https://github.com/jpablo1012/vritualbeams_asteroid",
+  "authors": [
+    "Juan Pablo Lopera <jpablo101296@gmail.com>"
+  ],
+  "main": "virtualbeams_asteroid.js",
+  "keywords": [
+    "Virtual",
+    "Beams",
+    "angular",
+    "meteor",
+    "asteroid",
+    "sockets",
+    "ddp"
+  ],
+  "dependencies": {
+    "angular": "^1.3.0",
+    "asteroid": "~0.6.1"
+  },
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

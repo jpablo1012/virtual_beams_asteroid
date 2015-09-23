@@ -75,7 +75,7 @@ angular.module('virtualbeamsAsteroid', [])
           asteroid = new Asteroid(vbaConfig.host);
           asteroid.on('connected', function () {
             vbaUtils.log('connected');
-            $rootScope.$on('virtualbeamsAsteroidConnected');
+            $rootScope.$broadcast('virtualbeamsAsteroidConnected');
           });
           asteroid.on('login', function (idUser) {
             vbaUtils.log('login', idUser);

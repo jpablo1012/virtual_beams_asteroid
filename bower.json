@@ -1,8 +1,8 @@
 {
   "name": "Virtual-Beams-Asteroid",
   "description": "A simple implementation of asteroid with angular",
-  "version": "0.5.1",
-  "homepage": "https://github.com/jpablo1012/vritualbeams_asteroid",
+  "version": "0.5.2",
+  "homepage": "https://github.com/jpablo1012/virtual_beams_asteroid",
   "authors": [
     "Juan Pablo Lopera <jpablo101296@gmail.com>"
   ],

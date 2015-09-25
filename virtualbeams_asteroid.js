@@ -5,6 +5,7 @@ angular.module('virtualbeamsAsteroid', [])
     function () {
       var log = false;
       var logError = false;
+      var loginRequired = true;
       var host = '';
 
       this.setLog = function (value) {
@@ -19,11 +20,16 @@ angular.module('virtualbeamsAsteroid', [])
         host = value;
       };
 
+      this.loginRequired = function (value) {
+        loginRequired = value;
+      };
+
       this.$get = function () {
         return {
           log: log,
           logError: logError,
-          host: host
+          host: host,
+          loginRequired: loginRequired
         };
       };
     }
@@ -59,7 +65,9 @@ angular.module('virtualbeamsAsteroid', [])
       var loginPromise = function (loginRequired) {
         var defered = $q.defer();
 
-        if (self.get().userId || !!loginRequired) {
+        loginRequired = angular.isUndefined(loginRequired) ? vbaConfig.loginRequired : loginRequired;
+
+        if (self.get().userId || !loginRequired) {
           defered.resolve();
         } else {
           $rootScope.$on('virtualbeamsAsteroidLogin', function () {

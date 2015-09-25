@@ -20,7 +20,7 @@ angular.module('virtualbeamsAsteroid', [])
         host = value;
       };
 
-      this.loginRequired = function (value) {
+      this.setLoginRequired = function (value) {
         loginRequired = value;
       };
 

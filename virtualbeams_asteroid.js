@@ -3,6 +3,7 @@
 angular.module('virtualbeamsAsteroid', [])
 .provider('vbaConfig', [
     function () {
+      var logPrefix = 'vba->';
       var log = false;
       var logError = false;
       var loginRequired = true;
@@ -26,6 +27,7 @@ angular.module('virtualbeamsAsteroid', [])
 
       this.$get = function () {
         return {
+          logPrefix: logPrefix,
           log: log,
           logError: logError,
           host: host,
@@ -40,7 +42,7 @@ angular.module('virtualbeamsAsteroid', [])
       this.log = function () {
         if (vbaConfig.log) {
           var args = Array.prototype.slice.call(arguments);
-          args.unshift('virtualbeamsAsteroid');
+          args.unshift(vbaConfig.logPrefix);
           console.log.apply(console, args);
         }
       };
@@ -48,7 +50,7 @@ angular.module('virtualbeamsAsteroid', [])
       this.error = function () {
         if (vbaConfig.logError) {
           var args = Array.prototype.slice.call(arguments);
-          args.unshift('virtualbeamsAsteroid');
+          args.unshift(vbaConfig.logPrefix);
           console.error.apply(console, args);
         }
       };
@@ -60,8 +62,11 @@ angular.module('virtualbeamsAsteroid', [])
     'vbaUtils',
     'vbaConfig',
     function ($rootScope, $q, vbaUtils, vbaConfig) {
+      
       var asteroid;
       var self = this;
+      var queries = {};
+
       var loginPromise = function (loginRequired) {
         var defered = $q.defer();
 
@@ -120,13 +125,17 @@ angular.module('virtualbeamsAsteroid', [])
           var subscription = asteroid.subscribe(config.nameSubscribe, config.params);
           return $q.when(subscription.ready);
         }).then(function () {
-          var query = self.get().getCollection(config.nameCollection).reactiveQuery({});
-          query.on('change', function () {
-            vbaUtils.log(config.nameSubscribe + ' change', query.result);
-            defered.notify(query.result);
-          });
-          vbaUtils.log(config.nameSubscribe, query.result);
-          defered.notify(query.result);
+          if (!queries[config.nameSubscribe]) {
+            queries[config.nameSubscribe] = self.get().getCollection(config.nameCollection).reactiveQuery({});
+            vbaUtils.log(config.nameSubscribe + ' subscribe', queries[config.nameSubscribe].result);
+
+            queries[config.nameSubscribe].on('change', function () {
+              vbaUtils.log(config.nameSubscribe + ' change', queries[config.nameSubscribe].result);
+              defered.notify(queries[config.nameSubscribe].result);
+            });
+          }
+
+          defered.notify(queries[config.nameSubscribe].result);
         }).catch(function (error) {
           vbaUtils.error(config.nameSubscribe, error);
           defered.reject(error);

@@ -126,7 +126,7 @@ angular.module('virtualbeamsAsteroid', [])
           var subscription = asteroid.subscribe(config.nameSubscribe, config.params);
           return $q.when(subscription.ready);
         }).then(function () {
-          if (!queries[querySubscribe]) {
+          if (!queries[querySubscribe] || config.force) {
             queries[querySubscribe] = self.get().getCollection(config.nameCollection).reactiveQuery({});
             vbaUtils.log(querySubscribe + ' subscribe', queries[querySubscribe].result);
 

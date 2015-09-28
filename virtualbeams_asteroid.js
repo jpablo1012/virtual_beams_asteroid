@@ -120,24 +120,25 @@ angular.module('virtualbeamsAsteroid', [])
 
       self.subscribe = function (config) {
         var defered = $q.defer();
+        var querySubscribe = config.nameSubscribe + (config.id ? config.id : '');
 
         loginPromise(config.loginRequired).then(function () {
           var subscription = asteroid.subscribe(config.nameSubscribe, config.params);
           return $q.when(subscription.ready);
         }).then(function () {
-          if (!queries[config.nameSubscribe]) {
-            queries[config.nameSubscribe] = self.get().getCollection(config.nameCollection).reactiveQuery({});
-            vbaUtils.log(config.nameSubscribe + ' subscribe', queries[config.nameSubscribe].result);
+          if (!queries[querySubscribe]) {
+            queries[querySubscribe] = self.get().getCollection(config.nameCollection).reactiveQuery({});
+            vbaUtils.log(querySubscribe + ' subscribe', queries[querySubscribe].result);
 
-            queries[config.nameSubscribe].on('change', function () {
-              vbaUtils.log(config.nameSubscribe + ' change', queries[config.nameSubscribe].result);
-              defered.notify(queries[config.nameSubscribe].result);
+            queries[querySubscribe].on('change', function () {
+              vbaUtils.log(querySubscribe + ' change', queries[querySubscribe].result);
+              defered.notify(queries[querySubscribe].result);
             });
           }
 
-          defered.notify(queries[config.nameSubscribe].result);
+          defered.notify(queries[querySubscribe].result);
         }).catch(function (error) {
-          vbaUtils.error(config.nameSubscribe, error);
+          vbaUtils.error(querySubscribe, error);
           defered.reject(error);
         });
 

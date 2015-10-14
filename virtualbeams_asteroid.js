@@ -3,35 +3,65 @@
 angular.module('virtualbeamsAsteroid', [])
 .provider('vbaConfig', [
     function () {
-      var logPrefix = 'vba->';
-      var log = false;
-      var logError = false;
-      var loginRequired = true;
-      var host = '';
+      var _logPrefix = 'vba->';
+      var _host = '';
+      var _log = false;
+      var _logError = false;
+      var _loginRequired = false;
+      var _ssl = false;
+
+      this.logPrefix = function (value) {
+        _logPrefix = value;
+      };
+
+      this.host = function (value) {
+        _host = value;
+      };
+
+      this.log = function (value) {
+        _log = !!value;
+      };
+
+      this.logError = function (value) {
+        _logError = !!value;
+      };
+
+      this.loginRequired = function (value) {
+        _loginRequired = value;
+      };
+
+      this.ssl = function (value) {
+        _ssl = !!value;
+      };
 
       this.setLog = function (value) {
-        log = !!value;
+        console.warn('vbaConfigProvider.setLog(true|false) has been deprecated, use vbaConfigProvider.log(true|false)');
+        _log = !!value;
       };
 
       this.setLogError = function (value) {
-        log = !!value;
+        console.warn('vbaConfigProvider.setLogError(true|false) has been deprecated, use vbaConfigProvider.logError(true|false)');
+        _logError = !!value;
       };
 
       this.setHost = function (value) {
-        host = value;
+        console.warn('vbaConfigProvider.setHost("host") has been deprecated, use vbaConfigProvider.host("host")');
+        _host = value;
       };
 
       this.setLoginRequired = function (value) {
-        loginRequired = value;
+        console.warn('vbaConfigProvider.setLoginRequired(true|false) has been deprecated, use vbaConfigProvider.loginRequired(true|false)');
+        _loginRequired = value;
       };
 
       this.$get = function () {
         return {
-          logPrefix: logPrefix,
-          log: log,
-          logError: logError,
-          host: host,
-          loginRequired: loginRequired
+          logPrefix: _logPrefix,
+          host: _host,
+          log: _log,
+          logError: _logError,
+          loginRequired: _loginRequired,
+          ssl: _ssl
         };
       };
     }
@@ -85,7 +115,7 @@ angular.module('virtualbeamsAsteroid', [])
 
       self.get = function () {
         if (typeof asteroid === 'undefined') {
-          asteroid = new Asteroid(vbaConfig.host);
+          asteroid = new Asteroid(vbaConfig.host, vbaConfig.ssl);
           asteroid.on('connected', function () {
             vbaUtils.log('connected');
             $rootScope.$broadcast('virtualbeamsAsteroidConnected');

@@ -151,6 +151,14 @@ angular.module('virtualbeamsAsteroid', [])
       self.subscribe = function (config) {
         var defered = $q.defer();
         var querySubscribe = config.nameSubscribe + (config.id ? config.id : '');
+        
+        var notify = function (result) {
+          if (typeof config.filter === 'function') {
+            result = config.filter(result);
+          }
+
+          defered.notify(result);
+        };
 
         loginPromise(config.loginRequired).then(function () {
           var subscription = asteroid.subscribe(config.nameSubscribe, config.params);
@@ -162,11 +170,11 @@ angular.module('virtualbeamsAsteroid', [])
 
             queries[querySubscribe].on('change', function () {
               vbaUtils.log(querySubscribe + ' change', queries[querySubscribe].result);
-              defered.notify(queries[querySubscribe].result);
+              notify(queries[querySubscribe].result);
             });
           }
 
-          defered.notify(queries[querySubscribe].result);
+          notify(queries[querySubscribe].result);
         }).catch(function (error) {
           vbaUtils.error(querySubscribe, error);
           defered.reject(error);

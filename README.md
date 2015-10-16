@@ -34,7 +34,7 @@ Then, add this in your html:
 
 For documentation and installation of **Asteroid** see https://github.com/mondora/asteroid
 
-Add `virtualbeamsAsteroid` to your app’s module dependencies.
+Add `virtualbeamsAsteroid` to your app’s dependencies module.
 
 ```js
 angular
@@ -176,6 +176,26 @@ An Angular promise.
 Subscribes to the specified subscription.
 
 This function **only** *notify* to the promise when data collection changes.
+
+**Arguments**
+
+* `config` **Object**
+
+    * `nameSubscribe` **String** *required*
+
+    * `nameCollection` **String** *required*
+
+    * `id` **String** *optional*, ***default***: `''`
+
+    * `params` **Any** *optional*, ***default***: `undefined`
+
+    * `force` **Boolean** *optional*, ***default***: `false`
+
+    * `loginRequired` **Boolean** *optional*, ***default***: `false`
+
+    * `selector` **Object | Function** *optional*, ***default***: `{}`
+
+    * `filter` **Function** *optional*, ***default***: `undefined`
 
 **Return**
 

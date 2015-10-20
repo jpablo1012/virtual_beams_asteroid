@@ -151,17 +151,18 @@ angular.module('virtualbeamsAsteroid', [])
       };
 
       self.call = function (method, data, config) {
-        var defered = $q.defer();
         config = config || {};
         data = data || {};
+        var defered = $q.defer();
         var extraData = vbaConfig.extraData || config.extraData;
-        config = config || {};
+        var loginRequired = angular.isUndefined(config.loginRequired) ? vbaConfig.loginRequiredInCalls : config.loginRequired;
 
         if (extraData) {
           data.extraData = getExtraData(extraData);
         }
 
-        loginPromise(config.loginRequired || vbaConfig.loginRequiredInCalls).then(function () {
+
+        loginPromise(loginRequired).then(function () {
           var promise = self.get().call(method, data);
           return $q.when(promise.result);
         }).then(function (result) {
@@ -179,6 +180,7 @@ angular.module('virtualbeamsAsteroid', [])
         var defered = $q.defer();
         var querySubscribe = config.nameSubscribe + (config.id ? config.id : '');
         var sendExtraData = vbaConfig.extraData || config.extraData;
+        var loginRequired = angular.isUndefined(config.loginRequired) ? vbaConfig.loginRequiredInSubscribes : config.loginRequired;
         config.params = config.params || {};
 
         var notify = function (result) {
@@ -194,7 +196,7 @@ angular.module('virtualbeamsAsteroid', [])
         }
 
         //no more i love you's
-        loginPromise(config.loginRequired || vbaConfig.loginRequiredInSubscribes).then(function () {
+        loginPromise(loginRequired).then(function () {
           var subscription = asteroid.subscribe(config.nameSubscribe, config.params);
 
           return $q.when(subscription.ready);

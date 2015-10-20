@@ -203,17 +203,19 @@ Calls a server-side method with the specified arguments.
 
 * `method` **String** *required*.
 
-* `data` **Object** *optional*.
+* `data` **String | Object** *optional*.
+
+    `data` must be Object if `config.extraData` or `vbaConfigProvider.extraData` are **true** or **String**
 
 * `config` **Object** *optional*.
 
     * `extraData` **Boolean | String** *optional*, ***default***: `false`.
     
-      If `extraData` or `vbaConfigProvider.extraData` are **true** or **String** then add `extraData` to `data` argument.
+        If `extraData` or `vbaConfigProvider.extraData` are **true** or **String** then add `extraData` to `data` argument.
 
     * `loginRequired` **Boolean** *optional*, ***default***: `false`.
 
-      If `loginRequired` or `vbaConfigProvider.loginRequired` are **true** then will call the specific method only if have session, otherwise, will wait until it have session.
+        If `loginRequired` or `vbaConfigProvider.loginRequired` are **true** then will call the specific method only if have session, otherwise, will wait until it have session.
 
 **Return**
 
@@ -241,13 +243,13 @@ This function **only** *notify* to the promise when data collection changes.
 
     * `extraData` **Boolean | String**, *optional*, ***default***: `false`
 
-      If `extraData` or `vbaConfigProvider.extraData` are **true** or **String** then add `extraData` to `config.params` argument.
+        If `extraData` or `vbaConfigProvider.extraData` are **true** or **String** then add `extraData` to `config.params` argument.
 
     * `force` **Boolean** *optional*, ***default***: `false`
 
     * `loginRequired` **Boolean** *optional*, ***default***: `false`
 
-      If `loginRequired` or `vbaConfigProvider.loginRequired` are **true** then will call the specific method only if have session, otherwise, will wait until it have session.
+        If `loginRequired` or `vbaConfigProvider.loginRequired` are **true** then will call the specific method only if have session, otherwise, will wait until it have session.
 
     * `selector` **Object | Function** *optional*, ***default***: `{}`
 

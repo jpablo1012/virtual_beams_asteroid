@@ -7,8 +7,10 @@ angular.module('virtualbeamsAsteroid', [])
       var _host = '';
       var _log = false;
       var _logError = false;
-      var _loginRequired = false;
+      var _loginRequiredInCalls = false;
+      var _loginRequiredInSubscribes = false;
       var _ssl = false;
+      var _extraData = false;
 
       this.logPrefix = function (value) {
         _logPrefix = value;
@@ -26,32 +28,25 @@ angular.module('virtualbeamsAsteroid', [])
         _logError = !!value;
       };
 
-      this.loginRequired = function (value) {
-        _loginRequired = value;
+      this.loginRequiredInCalls = function (value) {
+        _loginRequiredInCalls = value;
+      };
+
+      this.loginRequiredInSubscribes = function (value) {
+        _loginRequiredInSubscribes = value;
+      };
+
+      this.loginRequired = function () {
+        console.warn('vbaConfigProvider.loginRequired(true|false) has been deprecated');
+        console.info('use vbaConfigProvider.loginRequiredInCalls(true|false) and vbaConfigProvider.loginRequiredInSubscribes(true|false)');
       };
 
       this.ssl = function (value) {
         _ssl = !!value;
       };
 
-      this.setLog = function (value) {
-        console.warn('vbaConfigProvider.setLog(true|false) has been deprecated, use vbaConfigProvider.log(true|false)');
-        _log = !!value;
-      };
-
-      this.setLogError = function (value) {
-        console.warn('vbaConfigProvider.setLogError(true|false) has been deprecated, use vbaConfigProvider.logError(true|false)');
-        _logError = !!value;
-      };
-
-      this.setHost = function (value) {
-        console.warn('vbaConfigProvider.setHost("host") has been deprecated, use vbaConfigProvider.host("host")');
-        _host = value;
-      };
-
-      this.setLoginRequired = function (value) {
-        console.warn('vbaConfigProvider.setLoginRequired(true|false) has been deprecated, use vbaConfigProvider.loginRequired(true|false)');
-        _loginRequired = value;
+      this.extraData = function (value) {
+        _extraData = value;
       };
 
       this.$get = function () {
@@ -60,8 +55,10 @@ angular.module('virtualbeamsAsteroid', [])
           host: _host,
           log: _log,
           logError: _logError,
-          loginRequired: _loginRequired,
-          ssl: _ssl
+          loginRequiredInCalls: _loginRequiredInCalls,
+          loginRequiredInSubscribes: _loginRequiredInSubscribes,
+          ssl: _ssl,
+          extraData: _extraData
         };
       };
     }
@@ -100,58 +97,90 @@ angular.module('virtualbeamsAsteroid', [])
       var loginPromise = function (loginRequired) {
         var defered = $q.defer();
 
-        loginRequired = angular.isUndefined(loginRequired) ? vbaConfig.loginRequired : loginRequired;
-
         if (self.get().userId || !loginRequired) {
           defered.resolve();
         } else {
           $rootScope.$on('virtualbeamsAsteroidLogin', function () {
             defered.resolve();
           });
+          $rootScope.$on('virtualbeamsAsteroidLoginError', function () {
+            defered.reject();
+          });
         }
 
         return defered.promise;
       };
 
+      var getExtraData = function (extra) {
+        var aste = self.get();
+        var key;
+
+        if (extra === true) {
+          key = aste._host + '__' + aste._instanceId + '__login_token__';          
+        } else if (extra !== false) {
+          key = extra;
+        }
+
+        return localStorage[key];
+      };
+
       self.get = function () {
         if (typeof asteroid === 'undefined') {
           asteroid = new Asteroid(vbaConfig.host, vbaConfig.ssl);
+
           asteroid.on('connected', function () {
             vbaUtils.log('connected');
             $rootScope.$broadcast('virtualbeamsAsteroidConnected');
           });
+
           asteroid.on('login', function (idUser) {
             vbaUtils.log('login', idUser);
             $rootScope.$broadcast('virtualbeamsAsteroidLogin', idUser);
           });
+
           asteroid.on('logout', function () {
             vbaUtils.log('logout');
             $rootScope.$broadcast('virtualbeamsAsteroidLogout');
+          });
+
+          asteroid.on('loginError', function (err) {
+            $rootScope.$broadcast('virtualbeamsAsteroidLoginError', err);
           });
         }
         return asteroid;
       };
 
-      self.call = function () {
-        var args = Array.prototype.slice.call(arguments);
-        var method = args.shift();
+      self.call = function (method, data, config) {
         var defered = $q.defer();
-        var promise = self.get().apply(method, args);
+        config = config || {};
+        data = data || {};
+        var extraData = vbaConfig.extraData || config.extraData;
+        config = config || {};
 
-        $q.when(promise.result).then(function (result) {
+        if (extraData) {
+          data.extraData = getExtraData(extraData);
+        }
+
+        loginPromise(config.loginRequired || vbaConfig.loginRequiredInCalls).then(function () {
+          var promise = self.get().call(method, data);
+          return $q.when(promise.result);
+        }).then(function (result) {
           vbaUtils.log(method, result);
           defered.resolve(result);
-        }, function (error) {
+        }).catch(function (error) {
           vbaUtils.error(method, error);
           defered.reject(error);
         });
+
         return defered.promise;
       };
 
       self.subscribe = function (config) {
         var defered = $q.defer();
         var querySubscribe = config.nameSubscribe + (config.id ? config.id : '');
-        
+        var sendExtraData = vbaConfig.extraData || config.extraData;
+        config.params = config.params || {};
+
         var notify = function (result) {
           if (typeof config.filter === 'function') {
             result = config.filter(result);
@@ -160,8 +189,14 @@ angular.module('virtualbeamsAsteroid', [])
           defered.notify(result);
         };
 
-        loginPromise(config.loginRequired).then(function () {
+        if (sendExtraData) {
+          config.params.extraData = getExtraData(sendExtraData);
+        }
+
+        //no more i love you's
+        loginPromise(config.loginRequired || vbaConfig.loginRequiredInSubscribes).then(function () {
           var subscription = asteroid.subscribe(config.nameSubscribe, config.params);
+
           return $q.when(subscription.ready);
         }).then(function () {
           if (!queries[querySubscribe] || config.force) {

@@ -6,15 +6,19 @@ An implementation of Asteroid with Angular.
 
 * [Installation](#installation)
 
+* [Notes](#notes)
+
 * [Configuration](#configuration)
 
-    * [vbaConfigProvider](#vbaconfigprovider)
+    * [vbaConfigProvider](#vbaConfigProvider)
 
 * [API](#api)
 
     * [vbaService](#vbaservice)
 
     * [vbaUtils](#vbautils)
+
+    * [events](#events)
 
 ---
 
@@ -42,6 +46,14 @@ angular
     'virtualbeamsAsteroid'
   ]);
 ```
+
+---
+
+##Notes
+
+###Version 0.8.0
+
+This version of Virtual Beams Asteroid changes arguments of **subscribe** and **call** over previous versions causing errors in the application.
 
 ---
 
@@ -75,13 +87,13 @@ Set host.
 
 ---
 
-####ssl(isSSLActive)
+####ssl(isSSL)
 
 Set ssl.
 
 **Arguments**
 
-* `isSSLActive` **Boolean** *required*.
+* `isSSL` **Boolean** *required*.
 
 ***Default***: `false`.
 
@@ -111,13 +123,39 @@ Set logError.
 
 ---
 
-####loginRequired(loginIsRequired)
+####loginRequiredInCalls(required)
 
-Set loginRequired.
+Set login required in calls a server-side methods.
 
 **Arguments**
 
-* `loginIsRequired` **Boolean** *required*.
+* `required` **Boolean** *required*.
+
+***Default***: `false`.
+
+---
+
+####loginRequiredInSubscribes(required)
+
+Set login required in subscribes.
+
+**Arguments**
+
+* `required` **Boolean** *required*.
+
+***Default***: `false`.
+
+---
+
+####extraData(addExtraData)
+
+Add `extraData` to subscribe and method call's if `addExtraData` is true or String.
+
+If `addExtraData` is **true** then session token is added to `extraData`, but if `addExtraData` is **String** then add `localStorage[addExtraData]` to `extraData`.
+
+**Arguments**
+
+* `addExtraData` **Boolean | String** *required*.
 
 ***Default***: `false`.
 
@@ -133,7 +171,9 @@ angular.module('yourApp')
     vbaConfigProvider.ssl(true);
     vbaConfigProvider.log(true);
     vbaConfigProvider.logError(true);
-    vbaConfigProvider.loginRequired(false);
+    vbaConfigProvider.loginRequiredInCalls(false);
+    vbaConfigProvider.loginRequiredInSubscribes(false);
+    vbaConfigProvider.extraData('localStorageData');
   }]);
 ```
 
@@ -155,7 +195,7 @@ An Asteroid instance.
 
 ---
 
-####call(method, params...)
+####call(method, data, config)
 
 Calls a server-side method with the specified arguments.
 
@@ -163,7 +203,17 @@ Calls a server-side method with the specified arguments.
 
 * `method` **String** *required*.
 
-* `params...` *optional*.
+* `data` **Object** *optional*.
+
+* `config` **Object** *optional*.
+
+    * `extraData` **Boolean | String** *optional*, ***default***: `false`.
+    
+      If `extraData` or `vbaConfigProvider.extraData` are **true** or **String** then add `extraData` to `data` argument.
+
+    * `loginRequired` **Boolean** *optional*, ***default***: `false`.
+
+      If `loginRequired` or `vbaConfigProvider.loginRequired` are **true** then will call the specific method only if have session, otherwise, will wait until it have session.
 
 **Return**
 
@@ -179,7 +229,7 @@ This function **only** *notify* to the promise when data collection changes.
 
 **Arguments**
 
-* `config` **Object**
+* `config` **Object** *required*
 
     * `nameSubscribe` **String** *required*
 
@@ -187,11 +237,17 @@ This function **only** *notify* to the promise when data collection changes.
 
     * `id` **String** *optional*, ***default***: `''`
 
-    * `params` **Any** *optional*, ***default***: `undefined`
+    * `params` **Object** *optional*, ***default***: `{}`
+
+    * `extraData` **Boolean | String**, *optional*, ***default***: `false`
+
+      If `extraData` or `vbaConfigProvider.extraData` are **true** or **String** then add `extraData` to `config.params` argument.
 
     * `force` **Boolean** *optional*, ***default***: `false`
 
     * `loginRequired` **Boolean** *optional*, ***default***: `false`
+
+      If `loginRequired` or `vbaConfigProvider.loginRequired` are **true** then will call the specific method only if have session, otherwise, will wait until it have session.
 
     * `selector` **Object | Function** *optional*, ***default***: `{}`
 
@@ -209,7 +265,7 @@ An Angular promise.
 
 ####log(params...)
 
-If `vbaconfigprovider.log` is true then call:
+If `vbaConfigProvider.log` is true then call:
 
 `console.log(vbaConfigProvider.logPrefix, params...)`
 
@@ -217,6 +273,42 @@ If `vbaconfigprovider.log` is true then call:
 
 ####error(params...)
 
-If `vbaconfigprovider.logError` is true then call:
+If `vbaConfigProvider.logError` is true then call:
 
 `console.error(vbaConfigProvider.logPrefix, params...)`
+
+---
+
+###Events
+
+---
+
+####virtualbeamsAsteroidConnected
+
+This event fire when `Asteroid` connects with the server.
+
+---
+
+####virtualbeamsAsteroidLogin
+
+This event fire when user login is successful.
+
+**Arguments**
+
+* `idUser` **String**
+
+---
+
+####virtualbeamsAsteroidLogout
+
+This event fire when user logout is successful.
+
+---
+
+####virtualbeamsAsteroidLoginError
+
+This event fire when user login has an error
+
+**Arguments**
+
+* `error` **Object**

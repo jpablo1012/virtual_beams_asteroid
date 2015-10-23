@@ -218,11 +218,21 @@ angular.module('virtualbeamsAsteroid', [])
           defered.reject(error);
         });
 
-        if (config.returnInstance) {
-          return {promise: defered.promise, instance: subscription};
-        } else {
-          return defered.promise;
+        return defered.promise;
+      };
+
+      self.getSubscription = function (config) {
+        var subscriptions = self.get().subscriptions;
+        var keys =  Object.keys(subscriptions);
+        for (var i = 0; i < keys.length; i++) {
+          var subscription = subscriptions[keys[i]];
+
+          if (subscription._name === config.nameSubscribe) {
+            return subscription;
+          }
         }
+
+        return undefined;
       };
     }
   ]);

@@ -247,8 +247,6 @@ This function **only** *notify* to the promise when data collection changes.
 
     * `force` **Boolean** *optional*, ***default***: `false`
 
-    * `returnInstance` **Boolean** *optional*, ***default***: `false`
-
     * `loginRequired` **Boolean** *optional*, ***default***: `false`
 
         If `loginRequired` or `vbaConfigProvider.loginRequired` are **true** then will call the specific method only if have session, otherwise, will wait until it have session.

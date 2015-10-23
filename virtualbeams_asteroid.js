@@ -181,6 +181,7 @@ angular.module('virtualbeamsAsteroid', [])
         var querySubscribe = config.nameSubscribe + (config.id ? config.id : '');
         var sendExtraData = vbaConfig.extraData || config.extraData;
         var loginRequired = angular.isUndefined(config.loginRequired) ? vbaConfig.loginRequiredInSubscribes : config.loginRequired;
+        var subscription;
         config.params = config.params || {};
 
         var notify = function (result) {
@@ -197,7 +198,7 @@ angular.module('virtualbeamsAsteroid', [])
 
         //no more i love you's
         loginPromise(loginRequired).then(function () {
-          var subscription = asteroid.subscribe(config.nameSubscribe, config.params);
+          subscription = asteroid.subscribe(config.nameSubscribe, config.params);
 
           return $q.when(subscription.ready);
         }).then(function () {
@@ -217,7 +218,11 @@ angular.module('virtualbeamsAsteroid', [])
           defered.reject(error);
         });
 
-        return defered.promise;
+        if (config.returnInstance) {
+          return {promise: defered.promise, instance: subscription};
+        } else {
+          return defered.promise;
+        }
       };
     }
   ]);

@@ -78,6 +78,7 @@
       return Asteroid.utils.multiStorage.get(key);
     }).then(function (token) {
       if (!token) {
+        self._emit('loginError');
         throw new Error('No login token');
       }
 

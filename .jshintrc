@@ -12,6 +12,7 @@
   "unused": true,
   "globals": {
     "angular": false,
-    "Asteroid": false
+    "Asteroid": false,
+    "Q": false
   }
 }

@@ -24,8 +24,8 @@
       }
 
       Asteroid.utils.multiStorage.set(key, res.token);
-      self._emit('login', res.id);
-      defered.resolve(res.id);
+      self._emit('login', res);
+      defered.resolve(res);
     }
   };
 

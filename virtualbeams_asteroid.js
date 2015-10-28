@@ -251,9 +251,9 @@ angular.module('virtualbeamsAsteroid', [])
           $rootScope.$on('virtualbeamsAsteroidLogin', function () {
             defered.resolve();
           });
-          $rootScope.$on('virtualbeamsAsteroidLoginError', function () {
-            defered.reject();
-          });
+          // $rootScope.$on('virtualbeamsAsteroidLoginError', function () {
+          //   defered.reject();
+          // });
         }
 
         return defered.promise;

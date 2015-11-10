@@ -360,7 +360,6 @@ angular.module('virtualbeamsAsteroid', [])
         var querySubscribe = config.nameSubscribe + (config.id ? config.id : '');
         var sendExtraData = vbaConfig.extraData || config.extraData;
         var loginRequired = angular.isUndefined(config.loginRequired) ? vbaConfig.loginRequiredInSubscribes : config.loginRequired;
-        var subscription;
         config.params = config.params || {};
 
         var notify = function (result) {
@@ -368,29 +367,42 @@ angular.module('virtualbeamsAsteroid', [])
             result = config.filter(result);
           }
 
+          vbaUtils.log(querySubscribe + ' change');
           defered.notify(result);
+        };
+
+        var onChange = function () {
+          notify(queries[querySubscribe].result);
+        };
+
+        var onDestroy = function () {
+          if (config.scope) {
+            config.scope.$on('$destroy', function () {
+              console.log(arguments);
+              queries[querySubscribe].off('change', onChange);
+              delete queries[querySubscribe];
+            });
+          }
         };
 
         if (sendExtraData) {
           config.params.extraData = getExtraData(sendExtraData);
         }
-
         //no more i love you's
         loginPromise(loginRequired).then(function () {
-          subscription = asteroid.subscribe(config.nameSubscribe, config.params);
+          var subscription = asteroid.subscribe(config.nameSubscribe, config.params);
 
           return $q.when(subscription.ready);
         }).then(function () {
-          if (!queries[querySubscribe] || config.force) {
+          if (!queries[querySubscribe]) {
             queries[querySubscribe] = self.get().getCollection(config.nameCollection).reactiveQuery(config.selector || {});
-            vbaUtils.log(querySubscribe + ' subscribe', queries[querySubscribe].result);
-
-            queries[querySubscribe].on('change', function () {
-              vbaUtils.log(querySubscribe + ' change', queries[querySubscribe].result);
-              notify(queries[querySubscribe].result);
-            });
+            vbaUtils.log(querySubscribe + ' subscribe');
+            onDestroy();
+          } else {
+            queries[querySubscribe].off('change', onChange);
           }
 
+          queries[querySubscribe].on('change', onChange);
           notify(queries[querySubscribe].result);
         }).catch(function (error) {
           vbaUtils.error(querySubscribe, error);
@@ -410,8 +422,6 @@ angular.module('virtualbeamsAsteroid', [])
             return subscription;
           }
         }
-
-        return undefined;
       };
     }
   ]);

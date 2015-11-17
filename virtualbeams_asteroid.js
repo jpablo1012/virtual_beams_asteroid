@@ -367,7 +367,7 @@ angular.module('virtualbeamsAsteroid', [])
             result = config.filter(result);
           }
 
-          vbaUtils.log(querySubscribe + ' change');
+          vbaUtils.log(querySubscribe + ' change', result);
           defered.notify(result);
         };
 
@@ -378,7 +378,6 @@ angular.module('virtualbeamsAsteroid', [])
         var onDestroy = function () {
           if (config.scope) {
             config.scope.$on('$destroy', function () {
-              console.log(arguments);
               queries[querySubscribe].off('change', onChange);
               delete queries[querySubscribe];
             });
@@ -396,7 +395,7 @@ angular.module('virtualbeamsAsteroid', [])
         }).then(function () {
           if (!queries[querySubscribe]) {
             queries[querySubscribe] = self.get().getCollection(config.nameCollection).reactiveQuery(config.selector || {});
-            vbaUtils.log(querySubscribe + ' subscribe');
+            vbaUtils.log(querySubscribe + ' subscribe', queries[querySubscribe].result);
             onDestroy();
           } else {
             queries[querySubscribe].off('change', onChange);

@@ -380,6 +380,11 @@ angular.module('virtualbeamsAsteroid', [])
             config.scope.$on('$destroy', function () {
               queries[querySubscribe].off('change', onChange);
               delete queries[querySubscribe];
+
+              var sub = self.getSubscription({nameSubscribe: config.nameSubscribe});
+              if (sub) {
+                sub.stop();
+              }
             });
           }
         };

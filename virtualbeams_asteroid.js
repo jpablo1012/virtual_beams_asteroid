@@ -42,6 +42,7 @@
     this._resumeMethod = config.resumeMethod;
     this._logoutMethod = config.logoutMethod;
     this._runData = config.runData;
+    this._stopSubscriptionsOnLogout = config.stopSubscriptionsOnLogout;
 
     this._init();
   };
@@ -140,6 +141,7 @@ angular.module('virtualbeamsAsteroid', [])
       var _loginRequiredInSubscribes = false;
       var _ssl = false;
       var _extraData = false;
+      var _stopSubscriptionsOnLogout = false;
       var _loginMethod = 'login';
       var _resumeMethod = 'login';
       var _logoutMethod = 'logout';
@@ -177,6 +179,10 @@ angular.module('virtualbeamsAsteroid', [])
         _extraData = value;
       };
 
+      this.stopSubscriptionsOnLogout = function (value) {
+        _stopSubscriptionsOnLogout = value;
+      };
+
       this.loginMethod = function (value) {
         _loginMethod = value;
       };
@@ -203,6 +209,7 @@ angular.module('virtualbeamsAsteroid', [])
           loginRequiredInSubscribes: _loginRequiredInSubscribes,
           ssl: _ssl,
           extraData: _extraData,
+          stopSubscriptionsOnLogout: _stopSubscriptionsOnLogout,
           loginMethod: _loginMethod,
           resumeMethod: _resumeMethod,
           logoutMethod: _logoutMethod,
@@ -289,6 +296,10 @@ angular.module('virtualbeamsAsteroid', [])
 
           asteroid.on('logout', function () {
             vbaUtils.log('logout');
+            console.log(vbaConfig);
+            if (vbaConfig.stopSubscriptionsOnLogout) {
+              self.stopSubscriptions();
+            }
             $rootScope.$broadcast('virtualbeamsAsteroidLogout');
           });
 
@@ -297,6 +308,29 @@ angular.module('virtualbeamsAsteroid', [])
           });
         }
         return asteroid;
+      };
+
+      self.stopSubscriptions = function () {
+        var keys = Object.keys(queries);
+
+        for (var i = 0; i < keys.length; i++) {
+          var nameQuery = keys[i];
+          console.log(nameQuery);
+
+          if (queries[nameQuery]) {
+            for (var j = 0; j < queries[nameQuery]._events.change.length; j++) {
+              queries[nameQuery].off('change', queries[nameQuery]._events.change[j]);
+            }
+
+            delete queries[nameQuery];
+
+            var sub = self.getSubscription({nameSubscribe: nameQuery});
+
+            if (sub) {
+              sub.stop();
+            }
+          }
+        }
       };
 
       self.login = function (config) {

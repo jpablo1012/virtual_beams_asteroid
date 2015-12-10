@@ -161,6 +161,16 @@ If `addExtraData` is **true** then session token is added to `extraData`, but if
 
 ---
 
+####stopSubscriptionsOnLogout(stop)
+
+When the event `virtualbeamsAsteroidLogout` is fired and `stop` is **true** then call `stopSubscriptions`.
+
+**Arguments**
+
+* `stop` **Boolean** *required*
+
+***Default***: `false`
+
 ####Example
 
 ```js
@@ -260,6 +270,16 @@ This function **only** *notify* to the promise when data collection changes.
 **Return**
 
 An Angular promise.
+
+---
+
+###stopSubscriptions
+
+Stop all subscriptions.
+
+**Return**
+
+undefined.
 
 ---
 

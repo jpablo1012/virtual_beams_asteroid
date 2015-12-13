@@ -49,14 +49,6 @@ angular
 
 ---
 
-##Notes
-
-###Version 0.8.0
-
-This version of Virtual Beams Asteroid changes arguments of **subscribe** and **call** over previous versions causing errors in the application.
-
----
-
 ##Configuration
 
 ###vbaConfigProvider
@@ -310,6 +302,18 @@ If `vbaConfigProvider.logError` is true then call:
 ####virtualbeamsAsteroidConnected
 
 This event fire when `Asteroid` connects with the server.
+
+---
+
+####virtualbeamsAsteroidReconnected
+
+This event fire when `Asteroid` connects again with the server.
+
+---
+
+####virtualbeamsAsteroidDisconnected
+
+This event fire when the server's connection is closed.
 
 ---
 

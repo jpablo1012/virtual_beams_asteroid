@@ -31,20 +31,26 @@
 
   var VBAsteroid = function (host, ssl, config) {
     Asteroid.utils.must.beString(host);
-    this._instanceId ='0';
-    this._host = (ssl ? "https://" : "http://") + host;
-    this.collections = {};
-    this.subscriptions = {};
-    this._subscriptionsCache = {};
-    this._setDdpOptions(host, ssl);
+    var self = this;
+    self._instanceId = '0';
+    self._host = (ssl ? "https://" : "http://") + host;
+    self.collections = {};
+    self.subscriptions = {};
+    self._subscriptionsCache = {};
+    self._setDdpOptions(host, ssl);
 
-    this._loginMethod = config.loginMethod;
-    this._resumeMethod = config.resumeMethod;
-    this._logoutMethod = config.logoutMethod;
-    this._runData = config.runData;
-    this._stopSubscriptionsOnLogout = config.stopSubscriptionsOnLogout;
+    self._loginMethod = config.loginMethod;
+    self._resumeMethod = config.resumeMethod;
+    self._logoutMethod = config.logoutMethod;
+    self._runData = config.runData;
 
-    this._init();
+    self._init();
+
+    self.ddp.on('socket_close', function () {
+      if (self.ddp._reconnect_count === 0) {
+        self._emit('disconnected');
+      }
+    });
   };
 
   VBAsteroid.prototype = Asteroid.prototype;
@@ -287,6 +293,16 @@ angular.module('virtualbeamsAsteroid', [])
           asteroid.on('connected', function () {
             vbaUtils.log('connected');
             $rootScope.$broadcast('virtualbeamsAsteroidConnected');
+          });
+
+          asteroid.on('disconnected', function () {
+            vbaUtils.log('disconnected');
+            $rootScope.$broadcast('virtualbeamsAsteroidDisconnected');
+          });
+
+          asteroid.on('reconnected', function () {
+            vbaUtils.log('reconnected');
+            $rootScope.$broadcast('virtualbeamsAsteroidReconnected');
           });
 
           asteroid.on('login', function (idUser) {

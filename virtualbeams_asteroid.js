@@ -312,7 +312,6 @@ angular.module('virtualbeamsAsteroid', [])
 
           asteroid.on('logout', function () {
             vbaUtils.log('logout');
-            console.log(vbaConfig);
             if (vbaConfig.stopSubscriptionsOnLogout) {
               self.stopSubscriptions();
             }
@@ -331,7 +330,6 @@ angular.module('virtualbeamsAsteroid', [])
 
         for (var i = 0; i < keys.length; i++) {
           var nameQuery = keys[i];
-          console.log(nameQuery);
 
           if (queries[nameQuery]) {
             for (var j = 0; j < queries[nameQuery]._events.change.length; j++) {

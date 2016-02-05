@@ -259,6 +259,10 @@ This function **only** *notify* to the promise when data collection changes.
 
     * `filter` **Function** *optional*, ***default***: `undefined`.
 
+    * `reverse` **Boolean** *optional*, ***default***: `false`
+
+      If `reverse` is **true** then Virtual Beams Asteroid notify an array reversed.
+
 **Return**
 
 An Angular promise.

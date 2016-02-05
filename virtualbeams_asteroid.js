@@ -416,7 +416,7 @@ angular.module('virtualbeamsAsteroid', [])
           }
 
           vbaUtils.log(querySubscribe + ' change', result);
-          defered.notify(config.reverse && angular.isArray(result) ? result.reverse() : result);
+          defered.notify(config.reverse && angular.isArray(result) ? result.slice().reverse() : result);
         };
 
         var onChange = function () {
